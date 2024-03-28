@@ -5,12 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Camera, Loader2 } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
+import { configureWeb3Modal } from "@/connection";
+import useChatRegistration from "@/hooks/useChatRegistration";
+import { useNavigate } from "react-router-dom";
+
 
 const ChatRegistration = () => {
     const [selectedFile, setSelectedFile] = useState();
     const [ensName, setEnsName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    
+    const [imageUri, setImageUri] = useState("")
+    const navigate = useNavigate();
+
+    const register = useChatRegistration(ensName, imageUri);
+
+
+    configureWeb3Modal();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleSelectImage = ({ target }) => {
@@ -39,6 +49,10 @@ const ChatRegistration = () => {
 
             const fileUrl = `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
             console.log("File URL:", fileUrl);
+            setImageUri(fileUrl)
+
+            register();
+            navigate("/chat")
         } catch (error) {
             console.log("Pinata API Error:", error);
         } finally {
@@ -68,7 +82,7 @@ const ChatRegistration = () => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">Chatting with @johndoe</p>
                     </div>
                 </div>
-                <ConnectButton />
+                <w3m-button />
             </div>
 
             <div className="mx-auto max-w-sm space-y-4">

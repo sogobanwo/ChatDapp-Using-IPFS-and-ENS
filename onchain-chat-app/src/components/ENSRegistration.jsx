@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { configureWeb3Modal } from "@/connection";
+import { useNavigate } from "react-router-dom";
 import useENSRegistration from "@/hooks/useENSRegistration";
 
 
 const ENSRegistration = () => {
     configureWeb3Modal();
+    const navigate = useNavigate();
 
 
     const [ensName, setEnsName] = useState("");
@@ -23,7 +25,9 @@ const ENSRegistration = () => {
         setIsLoading(true);
 
         try {
-            register()
+           await register();
+           navigate("/registration");
+
         } catch (error) {
             console.log(error)
         } finally {
