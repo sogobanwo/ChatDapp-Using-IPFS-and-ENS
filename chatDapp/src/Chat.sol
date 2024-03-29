@@ -4,14 +4,14 @@ pragma solidity ^0.8.23;
 import "./IENS.sol";
 
 contract Chat {
+    error RECEIVER_DOES_NOT_EXIST();
+
     IENS public ens;
-    uint256 chatId;
+    uint256 messageId;
 
-    constructor(address ENS) {
-        ens = IENS(ENS);
+    constructor(address ensAddress) {
+        ens = IENS(ensAddress);
     }
-
-    event ChatStarted(address indexed sender, address indexed receiver);
 
     event MessageSent(
         address indexed sender,
@@ -20,100 +20,49 @@ contract Chat {
     );
 
     struct Message {
-        uint256 timestamp;
         string message;
-        string name;
+        string receiver;
+        string sender;
     }
 
-    struct Profile {
-        string name;
-        string imageURI;
-        bool registered;
-    }
+    mapping (uint => Message) eachChat;
 
-    mapping(address => mapping(address => uint256)) chatsIds;
-    mapping(uint256 => Message[]) chats;
-    mapping(address => string[]) conversationList;
-    mapping(address => mapping(address => bool)) conversationListMapping;
+    // mapping(address => mapping(address => uint256)) chatsIds;
+    mapping(address => mapping (address => Message[])) chats;
 
-    mapping(address => Profile)  profilesMapping;
-    Profile[] profiles; 
-
-    
-
-    function register(string memory _name, string memory _imageUri) external {
-        require(ens.getAddressFromName(_name) != address(0), "not a valid ENS");
-        require(ens.getAddressFromName(_name) == msg.sender, "ENS does not match your address");
-        require(!isRegistered(msg.sender), "You are already registered");
-        Profile memory newProfile;
-        newProfile.name = _name;
-        newProfile.imageURI = _imageUri;
-        newProfile.registered = true;
-
-        profilesMapping[msg.sender] = newProfile;
-        profiles.push(newProfile);
-    }
-
-    function isRegistered(address _user) public view returns (bool){
-        return profilesMapping[_user].registered;
-    }
-
-    function getProfile(address _user) external view returns(Profile memory){
-        require(profilesMapping[_user].registered, "user not registered");
-    
-        Profile memory profile= profilesMapping[_user];
-
-        return profile;
-    }
     //start chat
     function sendMessage(
         string calldata _receiver,
         string calldata _message
     ) external {
-        address receiver = ens.getAddressFromName(_receiver);
+        
+        address msgReceiver = ens.getProfileFromName(_receiver).userAddress;
 
-        require(isRegistered(msg.sender), "You are not registered");
-        require(isRegistered(receiver), "Receiver not registered");
+        if (msgReceiver == address(0)) revert RECEIVER_DOES_NOT_EXIST();
 
-        string memory sender = ens.getNameFromAddress(msg.sender);
+        string memory sender = ens.getProfileFromAddress(msg.sender).name;
 
-        uint256 myChatId = chatsIds[msg.sender][receiver];
-        uint256 friendChatId = chatsIds[receiver][msg.sender];
+        uint _messageId = messageId + 1;
 
-        if (myChatId == friendChatId && myChatId == 0) {
-            chatId = chatId + 1;
-            chatsIds[msg.sender][receiver] = chatId;
-            chatsIds[receiver][msg.sender] = chatId;
-            myChatId= chatId;
-        }
+        Message memory mssg = eachChat[_messageId];
+        mssg.message = _message;
+        mssg.sender = sender;
+        mssg.receiver = _receiver;
 
-        Message memory newMessage;
-        newMessage.name = sender;
-        newMessage.message = _message;
-        newMessage.timestamp = block.timestamp;
-        chats[myChatId].push(newMessage);
+        chats[msg.sender][msgReceiver].push(mssg);
+        chats[msgReceiver][msg.sender].push(mssg);
 
-        if (!conversationListMapping[msg.sender][receiver]) {
-            conversationList[msg.sender].push(_receiver);
-            conversationList[receiver].push(sender);
+        messageId++;
 
-            conversationListMapping[msg.sender][receiver] = true;
-            conversationListMapping[receiver][msg.sender] = true;
-        }
     }
 
     //retrieve chats
     function getChats(
         string calldata _receiver
     ) external view returns (Message[] memory) {
-        require(isRegistered(msg.sender), "you are not registered");
-        address receiver = ens.getAddressFromName(_receiver);
-        uint256 myChatId = chatsIds[msg.sender][receiver];
-        Message[] memory chat = chats[myChatId];
-        return chat;
-    }
+        address msgReceiver = ens.getProfileFromName(_receiver).userAddress;
+        if (msgReceiver == address(0)) revert RECEIVER_DOES_NOT_EXIST();
 
-    function getConversationList() external view returns (string[] memory) {
-        return conversationList[msg.sender];
+        return chats[msg.sender][msgReceiver];
     }
 }

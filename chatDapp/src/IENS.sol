@@ -2,17 +2,19 @@
 pragma solidity ^0.8.23;
 
 interface IENS {
-    function setName(string calldata _name) external;
+    struct ENSProfile {
+        address userAddress;
+        string name;
+        string imageUri;
+    }
+    
+    function setName(string calldata _name, string calldata _imageUri) external ;
 
-    function getAddressFromName(
+     function getProfileFromName(
         string calldata _name
-    ) external view returns (address);
+    ) external view returns (ENSProfile memory);
 
-    function getNameFromAddress(
+    function getProfileFromAddress(
         address _address
-    ) external view returns (string memory);
-
-    function getSentMessages(
-        string calldata _receiver
-    ) external view returns (string[] memory);
+    ) external view returns (ENSProfile memory);
 }
