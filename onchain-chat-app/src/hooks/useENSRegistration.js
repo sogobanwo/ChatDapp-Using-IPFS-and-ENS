@@ -7,11 +7,13 @@ import { isSupportedChain } from "../utils";
 import { isAddress } from "ethers";
 import { getProvider } from "../constants/providers";
 import { getENSContract } from "../constants/contracts";
+import toast from "react-hot-toast";
 
-const useENSRegistration = (_name) => {
+
+const useENSRegistration = (_name, _imageUri) => {
     const { chainId } = useWeb3ModalAccount();
     const { walletProvider } = useWeb3ModalProvider();
-    const {address} = useWeb3ModalAccount()
+    const { address } = useWeb3ModalAccount()
 
 
     return useCallback(async () => {
@@ -22,23 +24,27 @@ const useENSRegistration = (_name) => {
 
         const contract = getENSContract(signer);
 
+        const loadingToast1 = toast.loading('Creating your ENS name..');
         try {
-            const transaction = await contract.setName(_name);
+
+            const transaction = await contract.setName(_name, _imageUri);
 
             console.log("transaction: ", transaction);
             const receipt = await transaction.wait();
 
             console.log("receipt: ", receipt);
 
-            if (receipt.status) {
-                return console.log("Name successfully registered");
-            }
-
-            console.log("Name registration failed");
+            if (receipt.status) 
+                toast.remove(loadingToast1)
+                toast.success(`ENS Name Created`)
+                console.log("ENS registration successful");
+                return true
+            
         } catch (error) {
+            toast.remove(loadingToast1)
+            toast.error("Name already registered")
             console.error(
-                "error: ",
-                error.reason || "An unknown error occured" 
+                error.reason
             );
         }
     }, [address, chainId, walletProvider]);

@@ -3,7 +3,7 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "ENS",
+                "name": "ensAddress",
                 "type": "address"
             }
         ],
@@ -11,23 +11,9 @@
         "type": "constructor"
     },
     {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "sender",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "receiver",
-                "type": "address"
-            }
-        ],
-        "name": "ChatStarted",
-        "type": "event"
+        "inputs": [],
+        "name": "RECEIVER_DOES_NOT_EXIST",
+        "type": "error"
     },
     {
         "anonymous": false,
@@ -80,18 +66,18 @@
             {
                 "components": [
                     {
-                        "internalType": "uint256",
-                        "name": "timestamp",
-                        "type": "uint256"
-                    },
-                    {
                         "internalType": "string",
                         "name": "message",
                         "type": "string"
                     },
                     {
                         "internalType": "string",
-                        "name": "name",
+                        "name": "receiver",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "sender",
                         "type": "string"
                     }
                 ],
@@ -101,92 +87,6 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getConversationList",
-        "outputs": [
-            {
-                "internalType": "string[]",
-                "name": "",
-                "type": "string[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_user",
-                "type": "address"
-            }
-        ],
-        "name": "getProfile",
-        "outputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "string",
-                        "name": "name",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "imageURI",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "bool",
-                        "name": "registered",
-                        "type": "bool"
-                    }
-                ],
-                "internalType": "struct Chat.Profile",
-                "name": "",
-                "type": "tuple"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_user",
-                "type": "address"
-            }
-        ],
-        "name": "isRegistered",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "_imageUri",
-                "type": "string"
-            }
-        ],
-        "name": "register",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {

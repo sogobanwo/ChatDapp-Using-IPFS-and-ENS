@@ -1,37 +1,44 @@
 [
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "addressToName",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
+        "inputs": [],
+        "name": "ADDRESS_NOT_YET_REGISTERED",
+        "type": "error"
     },
     {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_name",
-                "type": "string"
-            }
-        ],
-        "name": "getAddressFromName",
+        "inputs": [],
+        "name": "NAME_ALREADY_EXISTED",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NAME_NOT_YET_REGISTERED",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "getAllProfiles",
         "outputs": [
             {
-                "internalType": "address",
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "userAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "imageUri",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct ENS.ENSProfile[]",
                 "name": "",
-                "type": "address"
+                "type": "tuple[]"
             }
         ],
         "stateMutability": "view",
@@ -45,31 +52,29 @@
                 "type": "address"
             }
         ],
-        "name": "getNameFromAddress",
+        "name": "getProfileFromAddress",
         "outputs": [
             {
-                "internalType": "string",
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "userAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "imageUri",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct ENS.ENSProfile",
                 "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "name": "nameToAddress",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
+                "type": "tuple"
             }
         ],
         "stateMutability": "view",
@@ -80,6 +85,47 @@
             {
                 "internalType": "string",
                 "name": "_name",
+                "type": "string"
+            }
+        ],
+        "name": "getProfileFromName",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "userAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "imageUri",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct ENS.ENSProfile",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_imageUri",
                 "type": "string"
             }
         ],
