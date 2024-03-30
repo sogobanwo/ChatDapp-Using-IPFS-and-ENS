@@ -6,8 +6,16 @@ import "./IENS.sol";
 contract Chat {
     error RECEIVER_DOES_NOT_EXIST();
 
+    struct Message {
+        string message;
+        address sender;
+        address receiver;
+    }
+
+    mapping(address => mapping(address => Message[])) private chats;
+    mapping(uint256 => Message) private messages;
+    uint256 private messageId;
     IENS public ens;
-    uint256 messageId;
 
     constructor(address ensAddress) {
         ens = IENS(ensAddress);
@@ -19,47 +27,34 @@ contract Chat {
         string message
     );
 
-    struct Message {
-        string message;
-        string receiver;
-        string sender;
-    }
-
-    mapping (uint => Message) eachChat;
-
-    // mapping(address => mapping(address => uint256)) chatsIds;
-    mapping(address => mapping (address => Message[])) chats;
-
-    //start chat
     function sendMessage(
         string calldata _receiver,
         string calldata _message
     ) external {
-        
         address msgReceiver = ens.getProfileFromName(_receiver).userAddress;
-
         if (msgReceiver == address(0)) revert RECEIVER_DOES_NOT_EXIST();
 
-        string memory sender = ens.getProfileFromAddress(msg.sender).name;
+        string memory senderName = ens.getProfileFromAddress(msg.sender).name;
+        uint256 _messageId = messageId + 1;
 
-        uint _messageId = messageId + 1;
-
-        Message memory mssg = eachChat[_messageId];
+        Message storage mssg = messages[_messageId];
         mssg.message = _message;
-        mssg.sender = sender;
-        mssg.receiver = _receiver;
+        mssg.sender = msg.sender;
+        mssg.receiver = msgReceiver;
 
         chats[msg.sender][msgReceiver].push(mssg);
         chats[msgReceiver][msg.sender].push(mssg);
 
         messageId++;
 
+        emit MessageSent(msg.sender, msgReceiver, _message);
     }
 
-    //retrieve chats
-    function getChats(
-        string calldata _receiver
-    ) external view returns (Message[] memory) {
+    function getChats(string calldata _receiver)
+        external
+        view
+        returns (Message[] memory)
+    {
         address msgReceiver = ens.getProfileFromName(_receiver).userAddress;
         if (msgReceiver == address(0)) revert RECEIVER_DOES_NOT_EXIST();
 
