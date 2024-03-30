@@ -19,7 +19,7 @@ contract ENS {
     mapping(string => ENSProfile) private nameToProfile;
     mapping (address => bool) isRegistered;
 
-    function setName(string calldata _name, string calldata _imageUri) external  {
+    function setName(string memory _name, string memory _imageUri) external  {
         if (nameToProfile[_name].userAddress != address(0)) revert NAME_ALREADY_EXISTED();
         if(isRegistered[msg.sender] == true) revert ADDRESS_ALREADY_REGISTERED();
 

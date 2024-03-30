@@ -5,12 +5,28 @@ import logo from "../assets/logo.png";
 import { configureWeb3Modal } from "@/connection";
 import { useState, useEffect } from "react";
 import useGetAllProfiles from "@/hooks/useGetAllProfiles";
+import useGetMessage from "@/hooks/useGetMessage";
+import useSendMessage from "@/hooks/useSendMessage";
 
 const Chat = () => {
+  const [receiver, setReceiver] = useState("")
+  const [receiverImageUri, setReceiverImageUri] = useState("")
+  const [message, setMessage] = useState("")
 
   configureWeb3Modal();
 
   const { loading, data: profiles } = useGetAllProfiles();
+  const { loading: messagesLoading, data: messages } = useGetMessage(receiver);
+  const sendMessage = useSendMessage(receiver, message)
+
+  const handleSendMessage = () => {
+    sendMessage()
+  }
+
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+  };
+
 
   return (
     <div className="flex flex-col h-screen border-t">
@@ -45,26 +61,25 @@ const Chat = () => {
                     profiles.length > 0 ?
                       profiles.map((profile, index) => {
                         return (
-                          <a className="flex items-center gap-4 p-2 rounded-lg bg-gray-100 dark:bg-gray-800" key={index} href="#">
+                          <a className="flex items-center gap-4 p-2 rounded-lg bg-gray-100 dark:bg-gray-800" key={index} onClick={() => {
+                            setReceiver(profile.name)
+                            setReceiverImageUri(profile.imageUri)
+                          }} href="#">
                             <Avatar className="w-12 h-12 border-2 border-white dark:border-gray-900">
                               <AvatarImage alt={profile.name} src={`https://gateway.pinata.cloud/ipfs/${profile.imageUri}`} />
                               <AvatarFallback>{profile.name}</AvatarFallback>
                             </Avatar>
-                            {console.log(profile.imageUri)}
 
-                            {/* address userAddress;
-      string name;
-      string imageUri; */}
                             <div className="flex-1 min-h-0">
                               <h3 className="font-semibold">{profile.name}</h3>
+                              <p className="text-sm truncate">{profile.userAddress}</p>
                               <p className="text-sm truncate">Hey! send me a message 😄👋</p>
+
                             </div>
                           </a>
                         )
                       }) : <h1>No users yet</h1>
                 }
-
-
               </div>
             </div>
           </div>
@@ -78,7 +93,7 @@ const Chat = () => {
                     alt="Avatar"
                     className="rounded-full"
                     height="40"
-                    src="/placeholder.svg"
+                    src={`https://gateway.pinata.cloud/ipfs/${receiverImageUri}`}
                     style={{
                       aspectRatio: "40/40",
                       objectFit: "cover",
@@ -87,7 +102,7 @@ const Chat = () => {
                   />
                   <AvatarFallback>Chats</AvatarFallback>
                 </Avatar>
-                <h1 className="text-xl font-bold leading-none">John Doe</h1>
+                <h1 className="text-xl font-bold leading-none">{receiver}</h1>
               </div>
               <div className="flex items-center justify-end space-x-4">
                 <Button size="icon" variant="ghost">
@@ -103,94 +118,47 @@ const Chat = () => {
           </div>
           <div className="flex-1 flex flex-col min-h-0 overflow-auto">
             <div className="grid gap-4 p-4">
-              <div className="flex items-start gap-4">
-                <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
-                  <AvatarImage alt="@johndoe" src="/placeholder-user.jpg" />
-                  <AvatarFallback>@johndoe</AvatarFallback>
-                </Avatar>
-                <div className="bg-gray-100 rounded-xl p-4 dark:bg-gray-800">
-                  <p>Hey! How's it going? 😄👋</p>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">2:14 PM</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 ml-auto">
-                <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
-                  <AvatarImage alt="@elladavis" src="/placeholder-user.jpg" />
-                  <AvatarFallback>@elladavis</AvatarFallback>
-                </Avatar>
-                <div className="rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
-                  <p>Not too bad! Just finished my morning coffee. How about you?</p>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">2:15 PM</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
-                  <AvatarImage alt="@janedoe" src="/placeholder-user.jpg" />
-                  <AvatarFallback>@janedoe</AvatarFallback>
-                </Avatar>
-                <div className="rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
-                  <p>Anyone up for a movie night later? 🍿🎬</p>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">2:12 PM</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 ml-auto">
-                <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
-                  <AvatarImage alt="@elladavis" src="/placeholder-user.jpg" />
-                  <AvatarFallback>@elladavis</AvatarFallback>
-                </Avatar>
-                <div className="rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
-                  <p>Not too bad! Just finished my morning coffee. How about you?</p>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">2:15 PM</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
-                  <AvatarImage alt="@janedoe" src="/placeholder-user.jpg" />
-                  <AvatarFallback>@janedoe</AvatarFallback>
-                </Avatar>
-                <div className="rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
-                  <p>Anyone up for a movie night later? 🍿🎬</p>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">2:12 PM</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 ml-auto">
-                <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
-                  <AvatarImage alt="@elladavis" src="/placeholder-user.jpg" />
-                  <AvatarFallback>@elladavis</AvatarFallback>
-                </Avatar>
-                <div className="rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
-                  <p>Not too bad! Just finished my morning coffee. How about you?</p>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">2:15 PM</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
-                  <AvatarImage alt="@janedoe" src="/placeholder-user.jpg" />
-                  <AvatarFallback>@janedoe</AvatarFallback>
-                </Avatar>
-                <div className="rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
-                  <p>Anyone up for a movie night later? 🍿🎬</p>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">2:12 PM</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 ml-auto">
-                <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
-                  <AvatarImage alt="@elladavis" src="/placeholder-user.jpg" />
-                  <AvatarFallback>@elladavis</AvatarFallback>
-                </Avatar>
-                <div className="rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
-                  <p>Not too bad! Just finished my morning coffee. How about you?</p>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">2:15 PM</div>
-                </div>
-              </div>
+              {
+                messagesLoading ? (<h1>Loading...</h1>) :
+                  messages.length > 0 ?
+                    messages.map((message, index) => {
+                      if (message.receiver == receiver) {
+                        return (
+                          <div className="flex items-start gap-4">
+                            <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
+                              <AvatarImage alt="@johndoe" src="/placeholder-user.jpg" />
+                              <AvatarFallback>@johndoe</AvatarFallback>
+                            </Avatar>
+                            <div className="bg-gray-100 rounded-xl p-4 dark:bg-gray-800">
+                              <p>Hey! How's it going? 😄👋</p>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">2:14 PM</div>
+                            </div>
+                          </div>
+                        )
+                      } else {
+                        return (
+                          <div className="flex items-start gap-4 ml-auto">
+                            <Avatar className="w-10 h-10 border-2 border-white dark:border-gray-900">
+                              <AvatarImage alt="@elladavis" src="/placeholder-user.jpg" />
+                              <AvatarFallback>@elladavis</AvatarFallback>
+                            </Avatar>
+                            <div className="rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
+                              <p>Not too bad! Just finished my morning coffee. How about you?</p>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">2:15 PM</div>
+                            </div>
+                          </div>)
+                      }
+                    }) : <h1>No Messages Yet</h1>
+              }
             </div>
           </div>
           <div className="border-t">
             <div className="flex items-center p-2">
-              <Textarea className="min-h-[60px] resize-none" placeholder="Type a message..." />
-              <Button className="ml-2">
+              <Textarea className="min-h-[60px] resize-none" placeholder="Type a message..." value={message}
+                onChange={handleMessageChange} />
+              <Button className="ml-2" onClick={() => handleSendMessage()}>
                 <SendIcon className="w-4 h-4" />
-                <span className="sr-only">Send</span>
+                <span className="sr-only" >Send</span>
               </Button>
             </div>
           </div>
